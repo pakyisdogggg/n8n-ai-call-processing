@@ -1,0 +1,20 @@
+[
+  {
+    "project": "ДемоПроект",
+    "status": "✅лид УМТМ",
+    "reason_code": "INTEREST",
+    "reason_text": "Клиент попросил рассказать подробнее."
+  },
+  {
+    "project": "ДемоПроект",
+    "status": "➖не лид",
+    "reason_code": "EXPLICIT_REFUSAL",
+    "reason_text": "Клиент явно отказался от предложения."
+  },
+  {
+    "project": "ДемоПроект",
+    "status": "🛑в стоп-лист",
+    "reason_code": "DO_NOT_CALL",
+    "reason_text": "Клиент потребовал прекратить звонки и пригрозил жалобой."
+  }
+]

@@ -1,0 +1,2232 @@
+{
+  "name": "AI Call Classification - Portfolio Demo",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {}
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -8080,
+        1216
+      ],
+      "id": "9e5a077f-371b-437b-9338-820f7affe3c3",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SOURCE_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESELECT_CALLS_SHEET_IN_N8N",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -7632,
+        1120
+      ],
+      "id": "b890e09e-6053-4753-bedf-c1ba34a153a4",
+      "name": "Get row(s) in sheet"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "474c976c-24f0-44f2-87b7-9a95621ca19e",
+              "leftValue": "={{ String($json.automation_status ?? '').trim() }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "empty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        -7408,
+        1120
+      ],
+      "id": "8409fa4d-046f-4a06-abd9-6e23663b6aa7",
+      "name": "Filter"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        -6960,
+        1216
+      ],
+      "id": "105c526e-e113-4bbb-857c-3edbd5fff027",
+      "name": "Loop Over Items",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c27d074c-f58c-40a8-a635-5d5c27335cff",
+              "name": "call_date",
+              "value": "={{ $json['Дата'].trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "9b5fb0fa-69a4-4472-9bbe-3b8fb7295d8b",
+              "name": "phone",
+              "value": "={{ $json['Номер'] }}",
+              "type": "number"
+            },
+            {
+              "id": "88f9c0bd-8534-4c51-aa4a-97784a3d94bf",
+              "name": "script",
+              "value": "={{ $json['Скрипт'].trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "cb01baaf-0dc9-49e2-ab10-efd99f5177b5",
+              "name": "target",
+              "value": "={{ $json['Цель'].trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "cc439ff5-30ee-47b4-8a85-223efded3bfa",
+              "name": "transcription",
+              "value": "={{ $json['Транскрибация'] }}",
+              "type": "string"
+            },
+            {
+              "id": "477dfea6-594e-4c5e-a5fb-ddd08eb7ae04",
+              "name": "source_row",
+              "value": "={{ $json.row_number }}",
+              "type": "number"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -6736,
+        1136
+      ],
+      "id": "a6f48dbf-bab7-45d5-a25b-b8fa09a244aa",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SOURCE_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESELECT_CALLS_SHEET_IN_N8N",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "automation_status": "processing",
+            "row_number": "={{ $('Loop Over Items').item.json.row_number }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "automation_status",
+              "displayName": "automation_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -6512,
+        1136
+      ],
+      "id": "62e29aff-2d24-4b18-90d7-c4afa2d93b3d",
+      "name": "Update row in sheet"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4ef67dac-8424-4a28-bc74-14eed2803c13",
+              "leftValue": "={{ $('Edit Fields').item.json.script }}",
+              "rightValue": "=Входящий звонок",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6064,
+        1040
+      ],
+      "id": "a568a107-9df2-4f8d-98df-5d4d72628599",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "mode": "chooseBranch"
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -7184,
+        1216
+      ],
+      "id": "2baa6acd-74c5-4c22-b616-079296392d8c",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ab0a4443-2a06-48a3-9eb0-e3ff1d9370c6",
+              "name": "row_number",
+              "value": "={{ $('Check_Empty_Fields').item.json.row_number }}",
+              "type": "number"
+            },
+            {
+              "id": "d7473b1f-1bfa-4930-bd5f-e35bf7df5a42",
+              "name": "phone",
+              "value": "={{ $('Edit Fields').item.json.phone }}",
+              "type": "number"
+            },
+            {
+              "id": "edc88a4b-4be8-49ea-a208-7f0f4ca8a3d2",
+              "name": "project",
+              "value": "={{ $('Edit Fields').item.json.script.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "29f3b281-df17-4f7c-a5e6-d98e2c9bb3ce",
+              "name": "call_date",
+              "value": "={{ $('Edit Fields').item.json.call_date }}",
+              "type": "string"
+            },
+            {
+              "id": "a8fd79d0-8fb3-4c1a-af7b-b343d508aabb",
+              "name": "script",
+              "value": "={{ $('Edit Fields').item.json.script.trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "d4e9111e-9fd3-49a7-870c-e6594f718d75",
+              "name": "target",
+              "value": "={{ $('Edit Fields').item.json.target }}",
+              "type": "string"
+            },
+            {
+              "id": "093e0aef-97c5-4e61-8134-6a63f29a0a37",
+              "name": "transcription",
+              "value": "={{ $('Edit Fields').item.json.transcription }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -5488,
+        1520
+      ],
+      "id": "7fe55f38-02a6-4d98-b1a8-a024b5a6ae5d",
+      "name": "Set_Project_From_Script"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "4ef67dac-8424-4a28-bc74-14eed2803c13",
+              "leftValue": "={{ $('Edit Fields').item.json.phone }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            },
+            {
+              "id": "b6b0c010-4bfd-431b-8bdd-14e98ec6edff",
+              "leftValue": "={{ $('Edit Fields').item.json.transcription }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -6288,
+        1136
+      ],
+      "id": "98400954-ddc2-4639-ad22-eb7747e117c2",
+      "name": "Check_Empty_Fields"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-5.6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-5.6-LUNA"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Ты определяешь проект звонка.\n\nНиже передано:\n1. значение поля \"Цель\" текущего звонка;\n2. список допустимых проектов.\n\nПравила:\n- выбери проект ТОЛЬКО из списка допустимых проектов;\n- верни название проекта точно так, как оно указано в списке;\n- название проекта может находиться в любой части поля \"Цель\";\n- регистр букв и положение названия в строке не имеют значения;\n- не придумывай новые проекты;\n- если определить проект однозначно невозможно, верни MANUAL_REVIEW;\n- если подходят несколько проектов, верни MANUAL_REVIEW;\n- в ответе верни только название проекта без пояснений.\n\nЦель звонка:\n{{ $('Edit Fields').item.json.target }}\n\nДопустимые проекты:\n{{ $('GS_Get_Projects').all().map(item => item.json['проект']).filter(Boolean).join('\\n') }}"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -5840,
+        944
+      ],
+      "id": "4f766585-416a-450f-a187-92c34f797406",
+      "name": "Message a model",
+      "retryOnFail": true,
+      "maxTries": 2
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SOURCE_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESELECT_PROJECTS_SHEET_IN_N8N",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -7856,
+        1312
+      ],
+      "id": "5b4a2397-5b18-457c-9eb8-34846ccea670",
+      "name": "GS_Get_Projects"
+    },
+    {
+      "parameters": {
+        "fieldsToAggregate": {
+          "fieldToAggregate": [
+            {
+              "fieldToAggregate": "project",
+              "renameField": true,
+              "outputFieldName": "projects"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        -7408,
+        1312
+      ],
+      "id": "27d2b1ff-0069-4f1d-9833-0a4affa86995",
+      "name": "Aggregate_Projects"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2cd302b9-bc6b-4599-b2ab-da6ee8b3032e",
+              "leftValue": "={{ $('Aggregate_Projects').first().json.projects.includes($json.project) }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -5264,
+        1040
+      ],
+      "id": "f76b4343-a8ce-4a35-aa54-aa6b370ebdce",
+      "name": "If | Validate_Project"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "4a259f0e-dc04-40c5-be89-7265fd2b148a",
+              "name": "project",
+              "value": "={{ $json['проект'].trim() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -7632,
+        1312
+      ],
+      "id": "1079b049-d0db-4b07-ac3f-a6611b89f62e",
+      "name": "Edit Fields | Normalize_Projects"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ab0a4443-2a06-48a3-9eb0-e3ff1d9370c6",
+              "name": "row_number",
+              "value": "={{ $('Check_Empty_Fields').item.json.row_number }}",
+              "type": "number"
+            },
+            {
+              "id": "d7473b1f-1bfa-4930-bd5f-e35bf7df5a42",
+              "name": "phone",
+              "value": "={{ $('Edit Fields').item.json.phone }}",
+              "type": "number"
+            },
+            {
+              "id": "edc88a4b-4be8-49ea-a208-7f0f4ca8a3d2",
+              "name": "project",
+              "value": "={{ $json.output[0].content[0].text }}",
+              "type": "string"
+            },
+            {
+              "id": "29f3b281-df17-4f7c-a5e6-d98e2c9bb3ce",
+              "name": "call_date",
+              "value": "={{ $('Edit Fields').item.json.call_date }}",
+              "type": "string"
+            },
+            {
+              "id": "a8fd79d0-8fb3-4c1a-af7b-b343d508aabb",
+              "name": "script",
+              "value": "={{ $('Edit Fields').item.json.script }}",
+              "type": "string"
+            },
+            {
+              "id": "d4e9111e-9fd3-49a7-870c-e6594f718d75",
+              "name": "target",
+              "value": "={{ $('Edit Fields').item.json.target }}",
+              "type": "string"
+            },
+            {
+              "id": "093e0aef-97c5-4e61-8134-6a63f29a0a37",
+              "name": "transcription",
+              "value": "={{ $('Edit Fields').item.json.transcription }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -5488,
+        944
+      ],
+      "id": "d09da549-98ae-442d-8234-4262acd161d7",
+      "name": "Set_Project_From_AI1"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{\n  {\n    searchOptions: [\n      {\n        type: \"phone\",\n        query: String($json.phone)\n      }\n    ]\n  }\n}}",
+        "options": {},
+        "url": "https://api.example.com/v1/lookup"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -4704,
+        656
+      ],
+      "id": "91cb6d4b-287d-40b7-bac8-e798a63e0af7",
+      "name": "HTTP Request",
+      "retryOnFail": false,
+      "maxTries": 3,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const NOT_FOUND = 'Имена не найдены';\n\ntry {\n  const sources = (\n    $json.data &&\n    typeof $json.data === 'object'\n  )\n    ? $json.data\n    : {};\n\n  const allNames = [];\n\n  // Функция пытается достать имя из ФИ / ФИО\n  function extractFirstName(fullName) {\n    if (typeof fullName !== 'string') {\n      return '';\n    }\n\n    const cleanStr = fullName\n      .replace(/[,;]/g, '')\n      .trim();\n\n    if (!cleanStr) {\n      return '';\n    }\n\n    const words = cleanStr\n      .split(/\\s+/)\n      .filter(Boolean);\n\n    if (words.length === 0) {\n      return '';\n    }\n\n    // Если всего одно слово\n    if (words.length === 1) {\n      return words[0];\n    }\n\n    // Ищем отчество.\n    // Если нашли — имя обычно находится перед ним.\n    for (let i = 1; i < words.length; i++) {\n      const word = words[i].toLowerCase();\n\n      if (\n        word.endsWith('вич') ||\n        word.endsWith('вна') ||\n        word.endsWith('ична') ||\n        word.endsWith('ич')\n      ) {\n        return words[i - 1];\n      }\n    }\n\n    // Если отчество не обнаружили,\n    // предполагаем формат \"Фамилия Имя\"\n    return words[1] || '';\n  }\n\n\n  // ==========================================\n  // 1. Собираем все name из ответа DataTech\n  // ==========================================\n\n  for (const source of Object.values(sources)) {\n\n    if (!source || typeof source !== 'object') {\n      continue;\n    }\n\n    const records = source.data;\n\n    if (!Array.isArray(records)) {\n      continue;\n    }\n\n    for (const record of records) {\n\n      if (\n        !record ||\n        typeof record !== 'object' ||\n        typeof record.name !== 'string'\n      ) {\n        continue;\n      }\n\n      const rawName = record.name.trim();\n\n      if (!rawName) {\n        continue;\n      }\n\n      // В одном поле name может быть несколько ФИО через ;\n      const splitNames = rawName.split(';');\n\n      for (const value of splitNames) {\n\n        const cleanName = value.trim();\n\n        if (!cleanName) {\n          continue;\n        }\n\n        // Сохраняем правило исходного Apps Script:\n        // записи с латиницей игнорируем\n        if (/[a-zA-Z]/.test(cleanName)) {\n          continue;\n        }\n\n        allNames.push(cleanName);\n      }\n    }\n  }\n\n\n  // ==========================================\n  // 2. Вообще ничего подходящего не найдено\n  // ==========================================\n\n  if (allNames.length === 0) {\n    return {\n      json: {\n        client_name: NOT_FOUND\n      }\n    };\n  }\n\n\n  // ==========================================\n  // 3. Группируем варианты по имени человека\n  // ==========================================\n\n  const groups = {};\n\n  for (const fullName of allNames) {\n\n    const firstName = extractFirstName(fullName);\n\n    if (!firstName) {\n      continue;\n    }\n\n    // Чтобы \"Иван\" и \"ИВАН\" считались одной группой\n    const key = firstName\n      .trim()\n      .toUpperCase();\n\n    if (!key) {\n      continue;\n    }\n\n    if (!groups[key]) {\n      groups[key] = {\n        count: 0,\n        longest: fullName\n      };\n    }\n\n    groups[key].count++;\n\n    // Внутри одной группы предпочитаем\n    // наиболее полное ФИО\n    if (\n      fullName.length >\n      groups[key].longest.length\n    ) {\n      groups[key].longest = fullName;\n    }\n  }\n\n\n  // ==========================================\n  // 4. Если группы почему-то не сформировались\n  // ==========================================\n\n  const groupValues = Object.values(groups);\n\n  if (groupValues.length === 0) {\n    return {\n      json: {\n        client_name: NOT_FOUND\n      }\n    };\n  }\n\n\n  // ==========================================\n  // 5. Выбираем победителя\n  // ==========================================\n\n  let winner = null;\n\n  for (const group of groupValues) {\n\n    if (!winner) {\n      winner = group;\n      continue;\n    }\n\n    // Сначала побеждает имя,\n    // которое встретилось чаще\n    if (group.count > winner.count) {\n      winner = group;\n      continue;\n    }\n\n    // При одинаковой частоте\n    // выбираем более полное ФИО\n    if (\n      group.count === winner.count &&\n      group.longest.length > winner.longest.length\n    ) {\n      winner = group;\n    }\n  }\n\n\n  // ==========================================\n  // 6. Финальный результат\n  // ==========================================\n\n  return {\n    json: {\n      client_name:\n        winner?.longest?.trim() || NOT_FOUND\n    }\n  };\n\n} catch (error) {\n\n  // Любая неожиданная структура JSON\n  // не должна ронять обработку звонка\n  return {\n    json: {\n      client_name: NOT_FOUND\n    }\n  };\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -4480,
+        656
+      ],
+      "id": "428be482-b78d-4a38-ac7d-aa024496a1f6",
+      "name": "Code | Resolve_Full_Name"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-6-luna",
+          "mode": "list",
+          "cachedResultName": "GPT-6-LUNA"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "=Ты выполняешь строго ограниченную задачу классификации транскрибации телефонного разговора.\n\nТвоя задача — определить бизнес-статус обращения ТОЛЬКО по предоставленной транскрибации и правилам ниже.\n\nНе придумывай отсутствующий контекст.\nНе угадывай неизвестные бизнес-правила.\nЕсли имеющейся информации недостаточно для надёжного определения статуса — отправляй запись на ручную проверку.\n\n\n==================================================\nВОЗМОЖНЫЕ РЕШЕНИЯ\n==================================================\n\ndecision = \"auto\"\nИспользуй, если статус можно определить однозначно.\n\ndecision = \"manual_review\"\nИспользуй только тогда, когда по смыслу транскрибации действительно невозможно надёжно выбрать статус.\n\n\n==================================================\nДОПУСТИМЫЕ БИЗНЕС-СТАТУСЫ\n==================================================\n\n1. \"стоп-лист\"\n2. \"не лид\"\n3. \"лид УМТМ\"\n\nСтатус \"дубль\" НЕ определяй.\nПроверка дублей выполняется отдельно средствами n8n.\n\n\n==================================================\nВАЖНО: ТЕХНИЧЕСКИЕ АРТЕФАКТЫ ТРАНСКРИБАЦИИ\n==================================================\n\nТранскрибация автоматически получена из речи и часто содержит технический шум:\n\n*\n**\n***\n*-\n-\n_\nлишние пробелы\nобрывки знаков\nповторяющиеся символы\nошибочную пунктуацию\n\nЭти символы сами по себе НЕ означают плохую транскрибацию и НЕ являются причиной для manual_review.\n\nМысленно игнорируй технические символы и анализируй понятные слова и общий смысл.\n\nНапример:\n\n\"аллё**актуально**хорошо*-\"\n\nследует понимать примерно как:\n\n\"аллё, актуально, хорошо\"\n\nЭто понятный положительный ответ и должно классифицироваться как:\n\ndecision = \"auto\"\nstatus = \"лид УМТМ\"\nreason_code = \"INTEREST\"\n\n\nИспользуй POOR_TRANSCRIPTION только если после игнорирования технического мусора смысл разговора всё равно невозможно надёжно установить.\n\n\n==================================================\nВАЖНО: ЗВЁЗДОЧКИ И НЕЦЕНЗУРНАЯ БРАНЬ\n==================================================\n\nСимволы \"*\" сами по себе НЕ означают нецензурную брань.\n\nНе ставь \"стоп-лист\" только из-за наличия:\n*\n**\n***\n\nСчитай нецензурную брань подтверждённой только если:\n\n- она явно распознаётся из слов;\n- либо агрессивный/оскорбительный смысл однозначно понятен из контекста.\n\nЕсли потенциально нецензурное слово полностью повреждено техническими символами и невозможно понять, действительно ли это была брань:\n\ndecision = \"manual_review\"\nstatus = null\nreason_code = \"AMBIGUOUS_PROFANITY\"\n\n\n==================================================\nСТАТУС: СТОП-ЛИСТ\n==================================================\n\nВыбирай \"стоп-лист\", если из контекста однозначно присутствует хотя бы одно из следующего:\n\n- явная агрессивная нецензурная брань в адрес оператора, компании, звонка или предложения;\n- прямые оскорбления;\n- сексуальные оскорбления или непристойные предложения оператору;\n- агрессивное требование прекратить звонки;\n- требование больше никогда не звонить в сочетании с выраженной агрессией;\n- угроза жалобой из-за нежелательных повторных звонков;\n- угроза судом или аналогичными последствиями из-за звонков.\n\nНе ставь \"стоп-лист\" из-за одного подозрительного слова, если весь остальной разговор явно положительный.\n\nЕсли потенциальная брань может быть ошибкой распознавания и контекст не позволяет решить однозначно — manual_review.\n\n\n==================================================\nСТАТУС: НЕ ЛИД\n==================================================\n\nВыбирай \"не лид\", если оснований для \"стоп-листа\" нет и клиент однозначно:\n\n- отказывается от предложения;\n- говорит, что ему неинтересно;\n- говорит, что предложение неактуально;\n- говорит \"не надо\", \"не нужно\", \"нет\" именно как отказ от предложения;\n- запрещает передавать свои контакты;\n- явно не хочет, чтобы ему звонил специалист;\n- явно отказывается от дальнейшего взаимодействия;\n- разговор происходит с автоответчиком, голосовым помощником, защитником номера или секретарём и невозможно получить реальное согласие потенциального клиента.\n\nНе ставь \"не лид\" только потому, что клиент:\n\n- сомневается;\n- задаёт вопросы;\n- просит объяснить подробнее;\n- хочет подумать;\n- занят;\n- просит перезвонить;\n- говорит, что сейчас неудобно.\n\n\n==================================================\nСТАТУС: ЛИД УМТМ\n==================================================\n\nВыбирай \"лид УМТМ\", если оснований для \"стоп-листа\" и \"не лид\" нет и клиент:\n\n- говорит, что предложение актуально;\n- проявляет интерес;\n- соглашается выслушать;\n- говорит \"рассказывайте\";\n- просит рассказать подробнее;\n- задаёт вопросы о предложении;\n- соглашается получить информацию;\n- соглашается на передачу контакта специалисту;\n- просит соединить со специалистом;\n- выражает потенциальную заинтересованность;\n- хочет подумать, но явно не отказывается;\n- просит перезвонить позже;\n- отвечает положительно или нейтрально без явного отказа.\n\n\nФразы:\n\n\"актуально\"\n\"интересно\"\n\"хорошо\"\n\"да\"\n\"рассказывайте\"\n\"можете прислать информацию\"\n\"надо подумать\"\n\"перезвоните позже\"\n\nпри отсутствии противоположного контекста НЕ являются причиной для \"не лид\".\n\n\n==================================================\nНЕИЗВЕСТНЫЕ БИЗНЕС-УСЛОВИЯ\n==================================================\n\nВ реальном бизнес-процессе статус иногда может зависеть от дополнительных условий, которые тебе НЕ предоставлены.\n\nНапример:\n\n- возраст клиента;\n- город или страна клиента;\n- географические ограничения;\n- специальные требования конкретного проекта;\n- финансовые ограничения;\n- другие неизвестные бизнес-критерии.\n\nНЕ ПРИДУМЫВАЙ такие правила.\n\nЕсли клиент сообщает подобную информацию и без дополнительного бизнес-правила невозможно понять, какой статус нужно поставить:\n\ndecision = \"manual_review\"\nstatus = null\n\nПример:\n\n\"Мне 17 лет.\"\n\nЕсли неизвестно, какой статус бизнес должен присвоить несовершеннолетнему:\n\ndecision = \"manual_review\"\nstatus = null\nreason_code = \"AGE_REQUIRES_RULE\"\n\n\nПример:\n\n\"Я сейчас живу в Казахстане.\"\n\nЕсли неизвестно, допустима ли эта страна:\n\ndecision = \"manual_review\"\nstatus = null\nreason_code = \"LOCATION_REQUIRES_RULE\"\n\n\n==================================================\nКОГДА ИСПОЛЬЗОВАТЬ MANUAL_REVIEW\n==================================================\n\nИспользуй manual_review только когда автоматическая классификация действительно ненадёжна.\n\nПричины:\n\n- после очистки технического шума смысл разговора невозможно понять;\n- транскрибация слишком фрагментарна;\n- присутствуют сильные противоречащие друг другу сигналы;\n- потенциальная нецензурная брань неразборчива;\n- решение зависит от неизвестного правила возраста;\n- решение зависит от неизвестного географического правила;\n- решение зависит от другого отсутствующего бизнес-правила;\n- для определения статуса приходится додумывать факты.\n\nНЕ отправляй в manual_review просто потому, что:\n\n- текст короткий;\n- присутствуют *, ** или *-;\n- плохая пунктуация;\n- клиент отвечает одним или двумя словами;\n- речь разговорная;\n- есть небольшие ошибки распознавания;\n\nесли общий смысл при этом понятен.\n\n\n==================================================\nПРИОРИТЕТ ОПРЕДЕЛЕНИЯ\n==================================================\n\nПроверяй последовательно:\n\n1. Есть ли однозначные основания для \"стоп-лист\".\n2. Если нет — есть ли однозначный отказ → \"не лид\".\n3. Если нет — есть ли понятный положительный или нейтрально-заинтересованный ответ → \"лид УМТМ\".\n4. Только если смысл действительно невозможно определить → manual_review.\n\n\n==================================================\nПРИМЕРЫ РЕАЛЬНОГО ФОРМАТА ТРАНСКРИБАЦИЙ\n==================================================\n\nПРИМЕР 1\n\nТранскрибация:\n\n\"аллё**актуально**хорошо*-\"\n\nОтвет:\n\n{\n  \"decision\": \"auto\",\n  \"status\": \"лид УМТМ\",\n  \"reason_code\": \"INTEREST\"\n}\n\n\nПРИМЕР 2\n\nТранскрибация:\n\n\"*да**интересно*рассказывайте*-\"\n\nОтвет:\n\n{\n  \"decision\": \"auto\",\n  \"status\": \"лид УМТМ\",\n  \"reason_code\": \"INTEREST\"\n}\n\n\nПРИМЕР 3\n\nТранскрибация:\n\n\"*да**можете информацию прислать*хорошо*-\"\n\nОтвет:\n\n{\n  \"decision\": \"auto\",\n  \"status\": \"лид УМТМ\",\n  \"reason_code\": \"CONSENT_TO_CONTACT\"\n}\n\n\nПРИМЕР 4\n\nТранскрибация:\n\n\"*не знаю**надо подумать*-\"\n\nОтвет:\n\n{\n  \"decision\": \"auto\",\n  \"status\": \"лид УМТМ\",\n  \"reason_code\": \"NEUTRAL_OR_THINKING\"\n}\n\n\nПРИМЕР 5\n\nТранскрибация:\n\n\"*сейчас неудобно**перезвоните попозже*-\"\n\nОтвет:\n\n{\n  \"decision\": \"auto\",\n  \"status\": \"лид УМТМ\",\n  \"reason_code\": \"CALL_BACK_LATER\"\n}\n\n\nПРИМЕР 6\n\nТранскрибация:\n\n\"*нет**не интересно*-\"\n\nОтвет:\n\n{\n  \"decision\": \"auto\",\n  \"status\": \"не лид\",\n  \"reason_code\": \"EXPLICIT_REFUSAL\"\n}\n\n\nПРИМЕР 7\n\nТранскрибация:\n\n\"*нет**неактуально**до свидания*-\"\n\nОтвет:\n\n{\n  \"decision\": \"auto\",\n  \"status\": \"не лид\",\n  \"reason_code\": \"NOT_RELEVANT\"\n}\n\n\nПРИМЕР 8\n\nТранскрибация:\n\n\"*не надо**мои контакты никому не передавайте*-\"\n\nОтвет:\n\n{\n  \"decision\": \"auto\",\n  \"status\": \"не лид\",\n  \"reason_code\": \"DO_NOT_SHARE_CONTACT\"\n}\n\n\nПРИМЕР 9\n\nТранскрибация:\n\n\"*хватит мне звонить**ещё раз позвоните жалобу подам*-\"\n\nОтвет:\n\n{\n  \"decision\": \"auto\",\n  \"status\": \"стоп-лист\",\n  \"reason_code\": \"DO_NOT_CALL\"\n}\n\n\nПРИМЕР 10\n\nТранскрибация содержит явную агрессивную нецензурную брань и оскорбления оператора.\n\nОтвет:\n\n{\n  \"decision\": \"auto\",\n  \"status\": \"стоп-лист\",\n  \"reason_code\": \"PROFANITY_AGGRESSION\"\n}\n\n\nПРИМЕР 11\n\nТранскрибация:\n\n\"*мне 17**а что вы предлагаете*-\"\n\nВозраст потенциально влияет на бизнес-статус, но соответствующее правило не предоставлено.\n\nОтвет:\n\n{\n  \"decision\": \"manual_review\",\n  \"status\": null,\n  \"reason_code\": \"AGE_REQUIRES_RULE\"\n}\n\n\nПРИМЕР 12\n\nТранскрибация:\n\n\"*я живу сейчас в другой стране**мне интересно*-\"\n\nНеизвестно, допускается ли эта география.\n\nОтвет:\n\n{\n  \"decision\": \"manual_review\",\n  \"status\": null,\n  \"reason_code\": \"LOCATION_REQUIRES_RULE\"\n}\n\n\nПРИМЕР 13\n\nТранскрибация:\n\n\"*да*** ***хорошо**интересно*-\"\n\nЕсли повреждённое место невозможно идентифицировать как реальную брань,\nа понятная часть разговора положительная,\nНЕ классифицируй автоматически как стоп-лист.\n\nОтвет:\n\n{\n  \"decision\": \"auto\",\n  \"status\": \"лид УМТМ\",\n  \"reason_code\": \"INTEREST\"\n}\n\n\nПРИМЕР 14\n\nТранскрибация:\n\n\"*ну**там***это**нет***потом**не знаю*-\"\n\nПосле удаления технических символов невозможно надёжно понять итоговое решение клиента.\n\nОтвет:\n\n{\n  \"decision\": \"manual_review\",\n  \"status\": null,\n  \"reason_code\": \"POOR_TRANSCRIPTION\"\n}\n\n\n==================================================\nФОРМАТ ОТВЕТА\n==================================================\n\nВерни ТОЛЬКО один валидный JSON-объект.\n\nНЕ используй Markdown.\nНЕ используй ```json.\nНЕ добавляй текст до JSON.\nНЕ добавляй текст после JSON.\nНЕ объясняй своё решение.\n\nДопустимые значения decision:\n\n\"auto\"\n\"manual_review\"\n\n\nДопустимые значения status:\n\n\"лид УМТМ\"\n\"не лид\"\n\"стоп-лист\"\nnull\n\n\nДопустимые значения reason_code:\n\n\"INTEREST\"\n\"CONSENT_TO_CONTACT\"\n\"NEUTRAL_OR_THINKING\"\n\"CALL_BACK_LATER\"\n\"EXPLICIT_REFUSAL\"\n\"NOT_RELEVANT\"\n\"DO_NOT_SHARE_CONTACT\"\n\"BOT_OR_SECRETARY\"\n\"PROFANITY_AGGRESSION\"\n\"SEXUAL_HARASSMENT\"\n\"DO_NOT_CALL\"\n\"LEGAL_THREAT\"\n\"POOR_TRANSCRIPTION\"\n\"AMBIGUOUS_PROFANITY\"\n\"CONFLICTING_SIGNALS\"\n\"AGE_REQUIRES_RULE\"\n\"LOCATION_REQUIRES_RULE\"\n\"UNKNOWN_BUSINESS_RULE\"\n\"INSUFFICIENT_CONTEXT\"\n\nreason_text — обязательное краткое пояснение НА РУССКОМ ЯЗЫКЕ,\nпочему был выбран данный статус или почему требуется ручная проверка.\n\nПояснение должно описывать конкретную причину,\nа не повторять название reason_code.\n\nДля manual_review reason_text должен позволять сотруднику\nсразу понять, что именно необходимо проверить вручную.\n\nПример автоматической классификации:\n\n{\n  \"decision\": \"auto\",\n  \"status\": \"лид УМТМ\",\n  \"reason_code\": \"INTEREST\"\n  \"reason_text\": \"Клиент явно подтвердил актуальность или интерес к предложению.\"\n}\n\n\nПример ручной проверки:\n\n{\n  \"decision\": \"manual_review\",\n  \"status\": null,\n  \"reason_code\": \"LOCATION_REQUIRES_RULE\",\n  \"reason_text\": \"Клиент сообщил локацию, но в правилах отсутствует информация о допустимой географии.\"\n}\n\n==================================================\nТРАНСКРИБАЦИЯ ДЛЯ КЛАССИФИКАЦИИ\n==================================================\n{{ $('If | Validate_Project').item.json.transcription }}\n"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        -4256,
+        656
+      ],
+      "id": "79433c37-05cc-4195-abfe-6fc54a045574",
+      "name": "OpenAI | Classify_Transcription",
+      "retryOnFail": true,
+      "maxTries": 2
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "// Номер исходной строки Google Sheets.\n// В Edit Fields мы ранее сохранили row_number как source_row.\nconst sourceRow =\n  $('Edit Fields').item.json.source_row ?? null;\n\n\n// Безопасный результат, если LLM вернула некорректный ответ.\nconst FALLBACK = {\n  source_row: sourceRow,\n  decision: 'manual_review',\n  status: null,\n  reason_code: 'INVALID_MODEL_RESPONSE',\n  reason_text:\n    'Ответ модели не удалось корректно обработать. Требуется ручная проверка.'\n};\n\n\ntry {\n\n  // Получаем текст ответа OpenAI\n  let rawText =\n    $json?.output?.[0]?.content?.[0]?.text;\n\n\n  // Ответ отсутствует\n  if (\n    typeof rawText !== 'string' ||\n    !rawText.trim()\n  ) {\n    return {\n      json: FALLBACK\n    };\n  }\n\n\n  // Убираем случайные ```json ... ```,\n  // если модель вдруг их добавит\n  rawText = rawText\n    .trim()\n    .replace(/^```json\\s*/i, '')\n    .replace(/^```\\s*/i, '')\n    .replace(/\\s*```$/, '')\n    .trim();\n\n\n  // Превращаем строку JSON в объект\n  const parsed = JSON.parse(rawText);\n\n\n  // Разрешённые значения decision\n  const allowedDecisions = [\n    'auto',\n    'manual_review'\n  ];\n\n\n  // Разрешённые статусы\n  const allowedStatuses = [\n    'лид УМТМ',\n    'не лид',\n    'стоп-лист',\n    null\n  ];\n\n\n  // Проверка decision\n  if (\n    !allowedDecisions.includes(parsed.decision)\n  ) {\n    return {\n      json: FALLBACK\n    };\n  }\n\n\n  // Проверка status\n  if (\n    !allowedStatuses.includes(parsed.status)\n  ) {\n    return {\n      json: FALLBACK\n    };\n  }\n\n\n  // manual_review не должен иметь бизнес-статус\n  if (\n    parsed.decision === 'manual_review' &&\n    parsed.status !== null\n  ) {\n    return {\n      json: FALLBACK\n    };\n  }\n\n\n  // auto обязан иметь бизнес-статус\n  if (\n    parsed.decision === 'auto' &&\n    parsed.status === null\n  ) {\n    return {\n      json: FALLBACK\n    };\n  }\n\n\n  // Всё корректно\n  return {\n    json: {\n      source_row: sourceRow,\n\n      decision: parsed.decision,\n      status: parsed.status,\n\n      reason_code:\n        parsed.reason_code ||\n        'UNKNOWN_REASON',\n\n      reason_text:\n        parsed.reason_text ||\n        'Причина моделью не указана.'\n    }\n  };\n\n\n} catch (error) {\n\n  // Любая ошибка парсинга →\n  // не роняем workflow, отправляем на ручную проверку\n  return {\n    json: FALLBACK\n  };\n\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3904,
+        656
+      ],
+      "id": "50a16244-10cf-44a3-8a69-113d6a720da1",
+      "name": "Code | Parse_Classification"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "81471668-6999-449c-aec2-7019d8678ddd",
+              "leftValue": "={{ $json.decision }}",
+              "rightValue": "manual_review",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -3680,
+        656
+      ],
+      "id": "b26b85d4-3bba-4c72-8df8-3617ccb00ba4",
+      "name": "If | Needs_Manual_Review"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_TARGET_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESELECT_LEADS_SHEET_IN_N8N",
+          "mode": "id"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Телефон",
+              "lookupValue": "={{ $('If | Validate_Project').item.json.phone }}"
+            },
+            {
+              "lookupColumn": "Проект",
+              "lookupValue": "={{ $('If | Validate_Project').item.json.project }}"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3792,
+        944
+      ],
+      "id": "7e16cd87-4152-4752-b90f-f6acdbb83ed7",
+      "name": "Get row(s) in sheet1",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "jsCode": "// Текущая обрабатываемая запись\nconst currentProject =\n  String(\n    $('If | Validate_Project').item.json.project ?? ''\n  ).trim();\n\nconst currentDateRaw =\n  String(\n    $('If | Validate_Project').first().json.call_date ?? ''\n  ).trim();\n\n// Парсим даты вида 18.09.26 или 18.09.2026\nfunction parseRuDate(value) {\n  if (!value) return null;\n\n  const parts = value.split('.');\n\n  if (parts.length !== 3) return null;\n\n  const day = Number(parts[0]);\n  const month = Number(parts[1]);\n  let year = Number(parts[2]);\n\n  if (year < 100) {\n    year += 2000;\n  }\n\n  const date = new Date(year, month - 1, day);\n\n  if (Number.isNaN(date.getTime())) {\n    return null;\n  }\n\n  return date;\n}\n\n\n// Возвращает предыдущий рабочий день.\n// Пока учитываем только субботу и воскресенье.\nfunction previousBusinessDay(date) {\n  const result = new Date(date);\n\n  do {\n    result.setDate(result.getDate() - 1);\n  } while (\n    result.getDay() === 0 || // воскресенье\n    result.getDay() === 6    // суббота\n  );\n\n  return result;\n}\n\n\nfunction sameDate(a, b) {\n  return (\n    a.getFullYear() === b.getFullYear() &&\n    a.getMonth() === b.getMonth() &&\n    a.getDate() === b.getDate()\n  );\n}\n\n\nconst currentDate = parseRuDate(currentDateRaw);\n\n// Fail-safe:\n// если текущую дату разобрать нельзя,\n// не объявляем запись дублем наугад.\nif (!currentDate) {\n  return [{\n    json: {\n      is_duplicate: false,\n      duplicate_check_error: true,\n      duplicate_reason: 'Не удалось разобрать дату текущего звонка'\n    }\n  }];\n}\n\n\nconst expectedPreviousDate =\n  previousBusinessDay(currentDate);\n\nlet duplicateFound = false;\nlet duplicateRow = null;\n\n\n// $input.all() = все строки с таким телефоном,\n// которые вернул Google Sheets\nfor (const item of $input.all()) {\n\n  const row = item.json;\n\n  const oldProject =\n    String(row['Проект'] ?? '').trim();\n\n  const oldDateRaw =\n    String(row['Дата'] ?? '').trim();\n\n  // Другой проект нас не интересует\n  if (oldProject !== currentProject) {\n    continue;\n  }\n\n  const oldDate = parseRuDate(oldDateRaw);\n\n  if (!oldDate) {\n    continue;\n  }\n\n  if (sameDate(oldDate, expectedPreviousDate)) {\n    duplicateFound = true;\n    duplicateRow = row;\n    break;\n  }\n}\n\n\nreturn [{\n  json: {\n    is_duplicate: duplicateFound,\n    duplicate_row: duplicateFound\n      ? duplicateRow?.row_number ?? null\n      : null\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -3568,
+        944
+      ],
+      "id": "d5434ddf-ac34-4476-9170-4ecba14241b1",
+      "name": "Code | Check_Duplicate"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SOURCE_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESELECT_CALLS_SHEET_IN_N8N",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "automation_status": "manual_review",
+            "row_number": "={{ $('If | Validate_Project').item.json.row_number }}",
+            "automation_comment": "={{ '[' + $('Code | Parse_Classification').item.json.reason_code + '] ' + $('Code | Parse_Classification').item.json.reason_text }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "automation_status",
+              "displayName": "automation_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "automation_comment",
+              "displayName": "automation_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3120,
+        560
+      ],
+      "id": "3444685f-e2dd-452c-a543-8349a73ab05c",
+      "name": "Update row manual_review"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SOURCE_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESELECT_CALLS_SHEET_IN_N8N",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "automation_status": "manual_review",
+            "row_number": "={{ $('Edit Fields').item.json.source_row }}",
+            "automation_comment": "Пустые значения в полях проекта или транскрибации"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "automation_status",
+              "displayName": "automation_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "automation_comment",
+              "displayName": "automation_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -3584,
+        1568
+      ],
+      "id": "a85a2e3c-4f2b-40c6-bb63-c0d774055b62",
+      "name": "Update row manual_review1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('Code | Parse_Classification').item.json.status }}",
+                    "rightValue": "стоп-лист",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "4b6b96f4-e28a-4d26-b9bc-0fa65bd0be3a"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "стоп-лист"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "ab31b9ff-4c07-4297-954b-b9822d34ddf9",
+                    "leftValue": "={{ \n  $('Code | Parse_Classification').item.json.status !== 'стоп-лист'\n  &&\n  $json.is_duplicate === true\n}}",
+                    "rightValue": "стоп-лист",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "дубль"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "777ad22c-1a11-42e3-a522-ee409ac53bea",
+                    "leftValue": "={{\n  $('Code | Parse_Classification').item.json.status === 'не лид'\n  &&\n  $json.is_duplicate === false\n}}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "не лид"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "cbd7c7e5-9c9a-4c55-ad04-b55afbe806cb",
+                    "leftValue": "={{   $('Code | Parse_Classification').item.json.status === 'лид УМТМ'   &&   $json.is_duplicate === false }}",
+                    "rightValue": "",
+                    "operator": {
+                      "type": "boolean",
+                      "operation": "true",
+                      "singleValue": true
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "лид УМТМ"
+            }
+          ]
+        },
+        "options": {
+          "fallbackOutput": "extra"
+        }
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -3344,
+        896
+      ],
+      "id": "700f6d7f-13fa-47f8-9665-d686969308c3",
+      "name": "Switch | Resolve_Final_Status"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "50d9b061-8505-4641-a7db-55b7f06d019b",
+              "name": "final_status",
+              "value": "🛑в стоп-лист",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -3120,
+        752
+      ],
+      "id": "036a7e51-0197-4233-a990-4f46c31e0438",
+      "name": "Edit Fields | Set_Status_Stoplist"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "50d9b061-8505-4641-a7db-55b7f06d019b",
+              "name": "final_status",
+              "value": "2️⃣дубль",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -3120,
+        944
+      ],
+      "id": "3aa2aac9-cdae-4a27-a9b2-9579de1d7efb",
+      "name": "Edit Fields | Set_Status_Double"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "50d9b061-8505-4641-a7db-55b7f06d019b",
+              "name": "final_status",
+              "value": "✅лид УМТМ",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -3120,
+        1328
+      ],
+      "id": "1cb617dc-3b9d-4113-9d24-ee828104216c",
+      "name": "Edit Fields | Set_Status_Lead"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "50d9b061-8505-4641-a7db-55b7f06d019b",
+              "name": "final_status",
+              "value": "➖не лид",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -3120,
+        1136
+      ],
+      "id": "38d92c70-d2b0-4f19-aaec-898e777b02fb",
+      "name": "Edit Fields | Set_Status_Not_Lead"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e686faab-d8d4-47a9-ae20-d0941f03f067",
+              "name": "source_row",
+              "value": "={{ $('If | Validate_Project').item.json.row_number }}",
+              "type": "string"
+            },
+            {
+              "id": "36669070-4f3c-40be-a982-7bdaf62e87fc",
+              "name": "call_date",
+              "value": "={{ $('If | Validate_Project').item.json.call_date }}",
+              "type": "string"
+            },
+            {
+              "id": "423d546f-d3a7-4f7a-822f-40b53b538aba",
+              "name": "phone",
+              "value": "={{ $('If | Validate_Project').item.json.phone }}",
+              "type": "number"
+            },
+            {
+              "id": "a52212e0-efda-4f68-bb6d-b4fc2d131d59",
+              "name": "client_name",
+              "value": "={{ $('Code | Resolve_Full_Name').item.json.client_name }}",
+              "type": "string"
+            },
+            {
+              "id": "35214288-9799-42dc-9a4d-c1a0874f2cdc",
+              "name": "project",
+              "value": "={{ $('If | Validate_Project').item.json.project }}",
+              "type": "string"
+            },
+            {
+              "id": "b7c5f367-e66c-453a-8190-9a33b140cf5d",
+              "name": "transcription",
+              "value": "={{ $('If | Validate_Project').item.json.transcription }}",
+              "type": "string"
+            },
+            {
+              "id": "25f3e971-c630-4837-8bbd-8919dcc0348e",
+              "name": "final_status",
+              "value": "={{ $json.final_status }}",
+              "type": "string"
+            },
+            {
+              "id": "ea18bbe5-848f-4ff3-8254-6eb1582d2558",
+              "name": "reason_code",
+              "value": "={{ $('Code | Parse_Classification').item.json.reason_code }}",
+              "type": "string"
+            },
+            {
+              "id": "34fa2f5f-9763-4366-b815-4a7ea22b4e58",
+              "name": "reason_text",
+              "value": "={{ $('Code | Parse_Classification').item.json.reason_text }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -2896,
+        1088
+      ],
+      "id": "b7147c74-b31e-40eb-801b-aac29d9d668e",
+      "name": "Edit Fields | Build_Final_Result"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SOURCE_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESELECT_CALLS_SHEET_IN_N8N",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $('Edit Fields | Build_Final_Result').item.json.source_row }}",
+            "automation_status": "processed",
+            "automation_comment": "={{ '[' + $('Code | Parse_Classification').item.json.reason_code + '] ' + $('Code | Parse_Classification').item.json.reason_text }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "automation_status",
+              "displayName": "automation_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "automation_comment",
+              "displayName": "automation_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2416,
+        1088
+      ],
+      "id": "2d6a158f-5980-4e36-8fd5-3a26031bc4ed",
+      "name": "Google Sheets | Mark_Processed"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_TARGET_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESELECT_LEADS_SHEET_IN_N8N",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Дата": "={{ $json.call_date }}",
+            "Имя": "={{ $json.client_name }}",
+            "Телефон": "={{ $json.phone }}",
+            "Проект": "={{ $json.project }}",
+            "Статус": "={{ $json.final_status }}",
+            "Текст ответа": "={{ $json.transcription }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Дата",
+              "displayName": "Дата",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Имя",
+              "displayName": "Имя",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Телефон",
+              "displayName": "Телефон",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Проект",
+              "displayName": "Проект",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Статус",
+              "displayName": "Статус",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Текст ответа",
+              "displayName": "Текст ответа",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2672,
+        1088
+      ],
+      "id": "a2c3fa81-8d1a-413e-a9a8-65469c706fe8",
+      "name": "Google Sheets | Append_Result"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SOURCE_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESELECT_CALLS_SHEET_IN_N8N",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "automation_status": "manual_review",
+            "row_number": "={{ $('Edit Fields').item.json.source_row }}",
+            "automation_comment": "Отсутствует проект в базе или ошибка LLM в определении наименования проекта"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "automation_status",
+              "displayName": "automation_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "automation_comment",
+              "displayName": "automation_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -2448,
+        1504
+      ],
+      "id": "6261f6cb-a764-48ef-9f75-b7d5c83ead42",
+      "name": "Update row manual_review2"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "41662dde-94f2-4ac0-9c73-c4470b501cd1",
+              "name": "run_result",
+              "value": "={{ $json.automation_status }}",
+              "type": "string"
+            },
+            {
+              "id": "b483969c-97ca-45a1-b3da-3ffe43a30c35",
+              "name": "final_status",
+              "value": "={{   $json.automation_status === 'processed'     ? $('Edit Fields | Build_Final_Result').item.json.final_status     : null }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -1920,
+        1696
+      ],
+      "id": "0d8824d3-3bd7-4591-a122-9288c76326a3",
+      "name": "Edit Fields | Set_Run_Result"
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\n\nconst stats = {\n  total: items.length,\n  processed: 0,\n  manual_review: 0,\n  errors: 0,\n\n  lead: 0,\n  not_lead: 0,\n  stop_list: 0,\n  duplicate: 0\n};\n\nfor (const item of items) {\n  const row = item.json ?? {};\n\n  if (row.run_result === 'manual_review') {\n    stats.manual_review++;\n    continue;\n  }\n\n  if (row.run_result === 'error') {\n    stats.errors++;\n    continue;\n  }\n\n  if (row.run_result === 'processed') {\n    stats.processed++;\n\n    // Убираем эмодзи и другие символы в начале статуса\n    const status = String(row.final_status ?? '')\n      .replace(/^[^\\p{L}\\p{N}]+/u, '')\n      .trim();\n\n    switch (status) {\n      case 'лид УМТМ':\n        stats.lead++;\n        break;\n\n      case 'не лид':\n        stats.not_lead++;\n        break;\n\n      case 'стоп-лист':\n        stats.stop_list++;\n        break;\n\n      case 'дубль':\n        stats.duplicate++;\n        break;\n    }\n  }\n}\n\nreturn [{\n  json: {\n    run_finished_at: new Date().toISOString(),\n    execution_id: $execution.id,\n    ...stats\n  }\n}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -6720,
+        656
+      ],
+      "id": "429cb5cb-2aa8-490d-9792-d20239bfea49",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SOURCE_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESELECT_STATISTICS_SHEET_IN_N8N",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Дата запуска": "={{ $json.run_finished_at }}",
+            "Execution ID": "={{ $json.execution_id }}",
+            "Всего ": "={{ $json.total }}",
+            "Обработано ": "={{ $json.processed }}",
+            "Ручная проверка": "={{ $json.manual_review }}",
+            "Ошибки": "={{ $json.errors }}",
+            "Лид УМТМ": "={{ $json.lead }}",
+            "Не лид": "={{ $json.not_lead }}",
+            "Стоп-лист": "={{ $json.stop_list }}",
+            "Дубль ": "={{ $json.duplicate }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "Дата запуска",
+              "displayName": "Дата запуска",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Execution ID",
+              "displayName": "Execution ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Всего ",
+              "displayName": "Всего ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Обработано ",
+              "displayName": "Обработано ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Лид УМТМ",
+              "displayName": "Лид УМТМ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Не лид",
+              "displayName": "Не лид",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Стоп-лист",
+              "displayName": "Стоп-лист",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Дубль ",
+              "displayName": "Дубль ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ручная проверка",
+              "displayName": "Ручная проверка",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Ошибки",
+              "displayName": "Ошибки",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -6496,
+        640
+      ],
+      "id": "c8c0f696-a7c3-4fff-b535-1e832fd3793a",
+      "name": "Append row in sheet"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9edc6e88-a46b-4192-946e-ff60f69e4667",
+              "name": "source_row",
+              "value": "={{ $('Edit Fields').item.json.source_row }}",
+              "type": "number"
+            },
+            {
+              "id": "180a964d-622d-48a4-8329-d69e7033a38f",
+              "name": "automation_status",
+              "value": "manual_review",
+              "type": "string"
+            },
+            {
+              "id": "e802a8e2-3963-492d-ab3e-4fbddb7a7255",
+              "name": "automation_comment",
+              "value": "={{ '[DATATECH_ERROR] Не удалось получить данные клиента из DataTech: ' + ($json.error?.message || $json.message || 'Неизвестная ошибка API') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        -4352,
+        992
+      ],
+      "id": "902f7d21-9d45-4aa7-8d12-e7f549ce0b38",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "REPLACE_WITH_SOURCE_SPREADSHEET_ID",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "RESELECT_CALLS_SHEET_IN_N8N",
+          "mode": "id"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "row_number": "={{ $json.source_row }}",
+            "automation_status": "manual_review",
+            "automation_comment": "={{ $json.automation_comment }}"
+          },
+          "matchingColumns": [
+            "row_number"
+          ],
+          "schema": [
+            {
+              "id": "automation_status",
+              "displayName": "automation_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "automation_comment",
+              "displayName": "automation_comment",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -4128,
+        992
+      ],
+      "id": "bd8fadb8-5e95-4464-96fd-341779fbf902",
+      "name": "Google Sheets | Mark_DataTech_Error"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        -4848,
+        992
+      ],
+      "id": "758f6127-0e99-4669-a881-be12e3ddeac8",
+      "name": "Wait"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "x-api-key"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"searchOptions\": [\n    {\n      \"type\": \"phone\",\n      \"query\": \"{{ String($('If | Validate_Project').item.json.phone) }}\"\n    }\n  ]\n}",
+        "options": {},
+        "url": "https://api.example.com/v1/lookup"
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -4576,
+        976
+      ],
+      "id": "5489d728-83b4-452c-9b2f-e291f94034a9",
+      "name": "HTTP Request | DataTech_Retry",
+      "retryOnFail": false,
+      "maxTries": 3,
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Get row(s) in sheet",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "GS_Get_Projects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet": {
+      "main": [
+        [
+          {
+            "node": "Filter",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Check_Empty_Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Set_Project_From_Script",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set_Project_From_Script": {
+      "main": [
+        [
+          {
+            "node": "If | Validate_Project",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check_Empty_Fields": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row manual_review1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message a model": {
+      "main": [
+        [
+          {
+            "node": "Set_Project_From_AI1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "GS_Get_Projects": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields | Normalize_Projects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Aggregate_Projects": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "If | Validate_Project": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row manual_review2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields | Normalize_Projects": {
+      "main": [
+        [
+          {
+            "node": "Aggregate_Projects",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set_Project_From_AI1": {
+      "main": [
+        [
+          {
+            "node": "If | Validate_Project",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Code | Resolve_Full_Name",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code | Resolve_Full_Name": {
+      "main": [
+        [
+          {
+            "node": "OpenAI | Classify_Transcription",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI | Classify_Transcription": {
+      "main": [
+        [
+          {
+            "node": "Code | Parse_Classification",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code | Parse_Classification": {
+      "main": [
+        [
+          {
+            "node": "If | Needs_Manual_Review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If | Needs_Manual_Review": {
+      "main": [
+        [
+          {
+            "node": "Update row manual_review",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "Code | Check_Duplicate",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code | Check_Duplicate": {
+      "main": [
+        [
+          {
+            "node": "Switch | Resolve_Final_Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row manual_review": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields | Set_Run_Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row manual_review1": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields | Set_Run_Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch | Resolve_Final_Status": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields | Set_Status_Stoplist",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields | Set_Status_Double",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields | Set_Status_Not_Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields | Set_Status_Lead",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Update row manual_review",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields | Set_Status_Stoplist": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields | Build_Final_Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields | Set_Status_Double": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields | Build_Final_Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields | Set_Status_Lead": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields | Build_Final_Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields | Set_Status_Not_Lead": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields | Build_Final_Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields | Build_Final_Result": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets | Append_Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets | Mark_Processed": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields | Set_Run_Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets | Append_Result": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets | Mark_Processed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row manual_review2": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields | Set_Run_Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields | Set_Run_Result": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets | Mark_DataTech_Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets | Mark_DataTech_Error": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields | Set_Run_Result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request | DataTech_Retry",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request | DataTech_Retry": {
+      "main": [
+        [
+          {
+            "node": "Code | Resolve_Full_Name",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  }
+}
